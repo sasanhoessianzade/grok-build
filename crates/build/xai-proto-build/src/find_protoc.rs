@@ -55,7 +55,11 @@ pub fn find_protoc() -> anyhow::Result<Option<PathBuf>> {
     loop {
         // Return relative path to make build more deterministic.
         let protoc = dir_rel.join("bin/protoc");
+        let metadata = protoc.metadata()?;
         if protoc.try_exists()? {
+            if !metadata.is_file(){
+                eprintln!("PROTOC points to `{}`, but it is not a file", protoc.display());
+            }
             match check_protoc_good(&protoc) {
                 Ok(()) => return Ok(Some(protoc)),
                 Err(e) => {
